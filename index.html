@@ -134,6 +134,7 @@
         const campos = [
             {id:"salario", nome:"Salário", tipo:"receita"},
             {id:"pai", nome:"PAI", tipo:"receita"},
+             {id:"lili", nome:"lili", tipo:"receita"},
             {id:"junior", nome:"Junior", tipo:"receita"},
             {id:"nubank", nome:"Nubank", tipo:"despesa"},
             {id:"mercado", nome:"Mercado Pago", tipo:"despesa"},
@@ -184,6 +185,7 @@
         function calcular(mes) {
             let salario = parseFloat(document.getElementById("salario-"+mes).value) || 0;
             let pai = parseFloat(document.getElementById("pai-"+mes).value) || 0;
+            let lili= parseFloat(document.getElementById("lili-"+mes).value) || 0;
             let junior = parseFloat(document.getElementById("junior-"+mes).value) || 0;
             let nubank = parseFloat(document.getElementById("nubank-"+mes).value) || 0;
             let mercado = parseFloat(document.getElementById("mercado-"+mes).value) || 0;
@@ -195,7 +197,7 @@
                 localStorage.setItem("desc-"+campo.id+"-"+mes, document.getElementById("desc-"+campo.id+"-"+mes).value);
             });
 
-            let receitaTotal = salario + pai + junior;
+            let receitaTotal = salario + pai + lili + junior;
             let despesas = nubank + mercado + digio + rastreador;
             let saldo = receitaTotal - despesas;
 
