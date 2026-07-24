@@ -259,6 +259,24 @@ window.onload = function() {
         mostrarAba(meses[0]); // Se não houver, mostra Janeiro
     }
 }
+
+function resetar(mes) {
+    const senha = prompt("Digite a senha para resetar os dados:");
+    if (senha === "123") {
+        campos.forEach(campo => {
+            // Remove apenas os valores numéricos do localStorage
+            localStorage.removeItem(campo.id+"-"+mes);
+            document.getElementById(campo.id+"-"+mes).value = "";
+            // Mantém a descrição como está (não altera o campo desc)
+        });
+        document.getElementById("resultado-"+mes).innerText = "Saldo disponível em " + mes + ": R$ 0,00";
+        document.getElementById("resultado-"+mes).style.color = "black";
+        alert("Números resetados com sucesso!");
+    } else {
+        alert("Senha incorreta. Ação cancelada.");
+    }
+}
+
     </script>
 </body>
 </html>
