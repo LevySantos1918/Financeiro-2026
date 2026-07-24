@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -225,6 +226,39 @@
                 calcular(mes);
             });
         }
+
+function mostrarAba(mes) {
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".conteudo").forEach(c => c.classList.remove("active"));
+    [...tabsDiv.children].forEach(tab => {
+        if(tab.innerText === mes) tab.classList.add("active");
+    });
+    document.getElementById(mes).classList.add("active");
+
+    // Salva o último mês selecionado
+    localStorage.setItem("ultimoMesSelecionado", mes);
+}
+
+window.onload = function() {
+    meses.forEach(mes => {
+        campos.forEach(campo => {
+            let valor = localStorage.getItem(campo.id+"-"+mes);
+            if(valor !== null) document.getElementById(campo.id+"-"+mes).value = valor;
+
+            let desc = localStorage.getItem("desc-"+campo.id+"-"+mes);
+            if(desc !== null) document.getElementById("desc-"+campo.id+"-"+mes).value = desc;
+        });
+        calcular(mes);
+    });
+
+    // Recupera o último mês selecionado
+    const ultimoMes = localStorage.getItem("ultimoMesSelecionado");
+    if (ultimoMes) {
+        mostrarAba(ultimoMes);
+    } else {
+        mostrarAba(meses[0]); // Se não houver, mostra Janeiro
+    }
+}
     </script>
 </body>
 </html>
