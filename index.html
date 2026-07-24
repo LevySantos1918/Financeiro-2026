@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Planilha Financeira</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Calibri, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+        }
+        .planilha {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 650px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 15px;
+        }
+        .tab {
+            flex: 1 1 25%;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            background: #e6f0ff;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            font-size: 0.9em;
+        }
+        .tab.active {
+            background: #fff;
+            font-weight: bold;
+        }
+        .conteudo {
+            display: none;
+        }
+        .conteudo.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #e6f0ff;
+        }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            text-align: center;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .saldo {
+            margin-top: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+        }
+        button {
+            margin-top: 15px;
+            padding: 12px;
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .reset {
+            background: #d9534f;
+        }
+        .reset:hover {
+            background: #c9302c;
+        }
+
+        /* Estilos para receita e despesa */
+        .receita {
+            background-color: #e6ffe6; /* verde claro */
+            border: 1px solid #4CAF50;
+            color: green;
+        }
+
+        .despesa {
+            background-color: #ffe6e6; /* vermelho claro */
+            border: 1px solid #d9534f;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="planilha">
+        <h1>📊 Planilha Financeira</h1>
+        <div class="tabs" id="tabs"></div>
+        <div id="conteudos"></div>
+    </div>
+
+    <script>
+        const meses = [
+            "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+            "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+        ];
+
+        const campos = [
+            {id:"salario", nome:"Salário", tipo:"receita"},
+            {id:"pai", nome:"PAI", tipo:"receita"},
+            {id:"junior", nome:"Junior", tipo:"receita"},
+            {id:"nubank", nome:"Nubank", tipo:"despesa"},
+            {id:"mercado", nome:"Mercado Pago", tipo:"despesa"},
+            {id:"digio", nome:"Digio", tipo:"despesa"},
+            {id:"rastreador", nome:"Rastreador", tipo:"despesa"}
+        ];
+
+        const tabsDiv = document.getElementById("tabs");
+        const conteudosDiv = document.getElementById("conteudos");
+
+        meses.forEach((mes, index) => {
+            const tab = document.createElement("div");
+            tab.className = "tab" + (index === 0 ? " active" : "");
+            tab.innerText = mes;
+            tab.onclick = () => mostrarAba(mes);
+            tabsDiv.appendChild(tab);
+
+            const conteudo = document.createElement("div");
+            conteudo.id = mes;
+            conteudo.className = "conteudo" + (index === 0 ? " active" : "");
+
+            let tabela = `<h3>Mês: ${mes}</h3><table><tr><th>Descrição</th><th>Valor (R$)</th></tr>`;
+            campos.forEach(campo => {
+                tabela += `
+                    <tr>
+                        <td><input type="text" id="desc-${campo.id}-${mes}" value="${campo.nome}" class="${campo.tipo}"></td>
+                        <td><input type="number" id="${campo.id}-${mes}" step="0.01" class="${campo.tipo}"></td>
+                    </tr>
+                `;
+            });
+            tabela += `</table>
+                <button onclick="calcular('${mes}')">Calcular Saldo</button>
+                <button class="reset" onclick="resetar('${mes}')">Resetar Dados</button>
+                <div class="saldo" id="resultado-${mes}"></div>`;
+            conteudo.innerHTML = tabela;
+            conteudosDiv.appendChild(conteudo);
+        });
+
+        function mostrarAba(mes) {
+            document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+            document.querySelectorAll(".conteudo").forEach(c => c.classList.remove("active"));
+            [...tabsDiv.children].forEach(tab => {
+                if(tab.innerText === mes) tab.classList.add("active");
+            });
+            document.getElementById(mes).classList.add("active");
+        }
+
+        function calcular(mes) {
+            let salario = parseFloat(document.getElementById("salario-"+mes).value) || 0;
+            let pai = parseFloat(document.getElementById("pai-"+mes).value) || 0;
+            let junior = parseFloat(document.getElementById("junior-"+mes).value) || 0;
+            let nubank = parseFloat(document.getElementById("nubank-"+mes).value) || 0;
+            let mercado = parseFloat(document.getElementById("mercado-"+mes).value) || 0;
+            let digio = parseFloat(document.getElementById("digio-"+mes).value) || 0;
+            let rastreador = parseFloat(document.getElementById("rastreador-"+mes).value) || 0;
+
+            campos.forEach(campo => {
+                localStorage.setItem(campo.id+"-"+mes, document.getElementById(campo.id+"-"+mes).value);
+                localStorage.setItem("desc-"+campo.id+"-"+mes, document.getElementById("desc-"+campo.id+"-"+mes).value);
+            });
+
+            let receitaTotal = salario + pai + junior;
+            let despesas = nubank + mercado + digio + rastreador;
+            let saldo = receitaTotal - despesas;
+
+            let resultado = document.getElementById("resultado-"+mes);
+            resultado.innerText = "Saldo disponível em " + mes + ": " + 
+                saldo.toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+            resultado.style.color = saldo >= 0 ? "green" : "red";
+        }
+
+        function resetar(mes) {
+            campos.forEach(campo => {
+                localStorage.removeItem(campo.id+"-"+mes);
+                document.getElementById(campo.id+"-"+mes).value = "";
+            });
+            document.getElementById("resultado-"+mes).innerText = "Saldo disponível em " + mes + ": R$ 0,00";
+            document.getElementById("resultado-"+mes).style.color = "black";
+        }
+
+        window.onload = function() {
+            meses.forEach(mes => {
+                campos.forEach(campo => {
+                    let valor = localStorage.getItem(campo.id+"-"+mes);
+                    if(valor !== null) document.getElementById(campo.id+"-"+mes).value = valor;
+
+                    let desc = localStorage.getItem("desc-"+campo.id+"-"+mes);
+                    if(desc !== null) document.getElementById("desc-"+campo.id+"-"+mes).value = desc;
+                });
+                calcular(mes);
+            });
+        }
+    </script>
+</body>
+</html>
